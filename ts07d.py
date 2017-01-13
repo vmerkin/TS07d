@@ -1,4 +1,4 @@
-from numpy import loadtxt,meshgrid,sqrt
+from numpy import loadtxt,meshgrid,sqrt,savetxt,vstack
 import numpy.ma as ma
 
 def get_data(xFileName,yFileName,jxbxFileName,jxbyFileName,baddata=-1.e4,rmin=1.5):
@@ -17,3 +17,8 @@ def get_data(xFileName,yFileName,jxbxFileName,jxbyFileName,baddata=-1.e4,rmin=1.
     jxby = ma.masked_where(r<=1.5,jxby)
 
     return(X,Y,jxbx,jxby)
+
+def save_data(outFile,x,y,data):
+    header = 'Nr=%d, Nt=%d'%(x.shape)
+    savedata = vstack((x.ravel(),y.ravel(),data.ravel())).T
+    savetxt(outFile,savedata,delimiter='   ',fmt='%.3e',header=header)

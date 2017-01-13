@@ -1,20 +1,15 @@
-import ts07d,solver
+#! /usr/bin/env python
+
+from pyTS07d import ts07d,solver,params
 from numpy import linspace,meshgrid,sin,cos,pi,arctan2,sqrt,vstack
 from scipy import interpolate
 from matplotlib import pyplot as plt
 
-xfile = '/Users/merkivg1/work/TS07d_pressure/xOutputFile.txt'
-yfile = '/Users/merkivg1/work/TS07d_pressure/yOutputFile.txt'
-jxbxfile  = '/Users/merkivg1/work/TS07d_pressure/jxbxOutputFile.txt'
-jxbyfile  = '/Users/merkivg1/work/TS07d_pressure/jxbyOutputFile.txt'
-Nr = 100
-Nt = 180
-rmax = 9.9
-rmin = 1.6
-
 to_center = lambda A: 0.25*(A[:-1,:-1]+A[1:,:-1]+A[:-1,1:]+A[1:,1:])
 
 if __name__ == "__main__":
+    (xfile,yfile,jxbxfile,jxbyfile,Nr,Nt,rmax,rmin,outDataFile,outPlotFile) = params.read()
+
     # read the data in
     x,y,jxbx,jxby = ts07d.get_data(xfile,yfile,jxbxfile,jxbyfile)
 
@@ -72,6 +67,10 @@ if __name__ == "__main__":
     plt.pcolormesh(xcc,ycc,pressure);plt.colorbar().set_label('Pressure')
     plt.xlabel('X, Re')
     plt.ylabel('Y, Re')
+    plt.savefig(outPlotFile)
+
+    # dump data file
+    ts07d.save_data(outDataFile,xcc,ycc,pressure)
     
 
     # plotting 
