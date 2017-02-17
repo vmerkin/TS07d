@@ -1,12 +1,17 @@
 from numpy import loadtxt,meshgrid,sqrt,savetxt,vstack
 import numpy.ma as ma
 
-def get_data(xFileName,yFileName,jxbxFileName,jxbyFileName,baddata=-1.e4,rmin=1.5):
-    x=loadtxt(xFileName)[::-1]; Nx = x.size   # note the axis flip to get ascending order
+def get_data(xFileName,yFileName,jxbxFileName,jxbyFileName,baddata=-1.e4,rmin=1.5,xflip=False):
     y=loadtxt(yFileName); Ny = y.size
-    jxbx=loadtxt(jxbxFileName).reshape(Ny,Nx)[:,::-1]
-    jxby=loadtxt(jxbyFileName).reshape(Ny,Nx)[:,::-1]
-
+    if xflip:
+        x=loadtxt(xFileName)[::-1]; Nx = x.size   # note the axis flip to get ascending order
+        jxbx=loadtxt(jxbxFileName).reshape(Ny,Nx)[:,::-1]
+        jxby=loadtxt(jxbyFileName).reshape(Ny,Nx)[:,::-1]
+    else:
+        x=loadtxt(xFileName); Nx = x.size   # note the axis flip to get ascending order
+        jxbx=loadtxt(jxbxFileName).reshape(Ny,Nx)
+        jxby=loadtxt(jxbyFileName).reshape(Ny,Nx)
+    
     X,Y=meshgrid(x,y)
     r=sqrt(X**2+Y**2)
 
