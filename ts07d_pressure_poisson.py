@@ -8,13 +8,13 @@ from matplotlib import pyplot as plt
 to_center = lambda A: 0.25*(A[:-1,:-1]+A[1:,:-1]+A[:-1,1:]+A[1:,1:])
 
 if __name__ == "__main__":
-    (xfile,yfile,jxbxfile,jxbyfile,Nr,Nt,rmax,rmin,outDataFile,outPlotFile) = params.read()
+    args = params.read()
 
     # read the data in
-    x,y,jxbx,jxby = ts07d.get_data(xfile,yfile,jxbxfile,jxbyfile)
+    x,y,jxbx,jxby = ts07d.get_data(args.xfile,args.yfile,args.jxbxfile,args.jxbyfile,xflip=args.xflip)
 
     # this is the cylindrical grid to which we interpolate
-    rc,tc=meshgrid(linspace(rmin,rmax,Nr),linspace(0,2*pi,Nt))
+    rc,tc=meshgrid(linspace(args.rmin,args.rmax,args.Nr),linspace(0,2*pi,args.Nt))
     xc,yc = rc*cos(tc),rc*sin(tc)
 
     # will also need cell centers for these
@@ -53,24 +53,33 @@ if __name__ == "__main__":
     divJB = 1/rcc*(djr+djt)
     
     # Poisson solver
-    s = solver.solver(Nr-1,Nt-1,rcc.T,dr,dt)  # note, size reduced to number or cell centers
+    s = solver.solver(args.Nr-1,args.Nt-1,rcc.T,dr,dt)  # note, size reduced to number or cell centers
     s.setStencilMatrixNp()
     s.setRHSNp(divJB.T)
     pressure = s.solve()
-    pressure = pressure.reshape(Nr-1,Nt-1)
+    pressure = pressure.reshape(args.Nr-1,args.Nt-1)
     
     # fix periodic boundary for plotting
     xcc = vstack((xcc,xcc[[0],:]))
     ycc = vstack((ycc,ycc[[0],:]))
-    pressure = vstack((pressure.T,pressure.T[[0],:]))
+    pressure = vstack((pressure.T,pressure.T[[0],:]))*6.4e-3   # convert to nPa
     plt.figure()
-    plt.pcolormesh(xcc,ycc,pressure);plt.colorbar().set_label('Pressure')
+    if args.red_blue_cb:
+        cmap=plt.cm.RdBu_r 
+    else:
+        cmap=plt.cm.viridis
+
+    plt.pcolormesh(xcc,ycc,pressure,cmap=cmap,vmin=args.vmin,vmax=args.vmax);
+    plt.colorbar().set_label('Pressure, nPa')
     plt.xlabel('X, Re')
     plt.ylabel('Y, Re')
-    plt.savefig(outPlotFile)
+    plt.xlim(xcc.max(),xcc.min())
+    plt.ylim(ycc.max(),ycc.min())
+    plt.title('rmin=%.1f, rmax=%.1f'%(args.rmin,args.rmax))
+    plt.savefig(args.outPlotFile)
 
     # dump data file
-    ts07d.save_data(outDataFile,xcc,ycc,pressure)
+    ts07d.save_data(args.outDataFile,xcc,ycc,pressure)
     
 
     # plotting 
