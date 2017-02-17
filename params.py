@@ -13,7 +13,10 @@ def read():
     parser.add_argument('--rmax',help='Maximum radius of the domain (Re)',nargs='?',default=9.9,type=float)
     parser.add_argument('--outDataFile',help='File to output the results.',nargs='?',default='ts07d_pressure.dat')
     parser.add_argument('--outPlotFile',help='File to output the results.',nargs='?',default='ts07d_pressure.png')
-    parser.add_argument('--xflip',help='Flip X axis in input files? Default is False.',action="store_false")
+    parser.add_argument('--xflip',help='Flip X axis in input files? Default is False.',action="store_true")
+    parser.add_argument('--vmin',help='Min value for plotting pressure.',default=0,type=float)
+    parser.add_argument('--vmax',help='Max value for plotting pressure.',default=100,type=float)
+    parser.add_argument('--red_blue_cb',help='Whether to use RdBu colorbar (Misha favorite.)',action="store_true")
     args = parser.parse_args()
 
     if not (os.path.exists(args.xfile) and
@@ -22,7 +25,7 @@ def read():
             os.path.exists(args.jxbyfile) ):
         sys.exit('One or more input files do not exist. Quitting.')
 
-    return(args.xfile,args.yfile,args.jxbxfile,args.jxbyfile,args.Nr,args.Nt,args.rmax,args.rmin,args.outDataFile,args.outPlotFile,args.xflip)
+    return(args)
 
 
         
