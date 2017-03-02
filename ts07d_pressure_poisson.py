@@ -62,7 +62,7 @@ if __name__ == "__main__":
     # fix periodic boundary for plotting
     xcc = vstack((xcc,xcc[[0],:]))
     ycc = vstack((ycc,ycc[[0],:]))
-    pressure = vstack((pressure.T,pressure.T[[0],:]))*6.4e-3   # convert to nPa
+    pressure = vstack((pressure.T,pressure.T[[0],:]))*6.4e-3   # convert to nPa: j[nA/m2], B[nT], x,y[Re]
     plt.figure()
     if args.red_blue_cb:
         cmap=plt.cm.RdBu_r 
